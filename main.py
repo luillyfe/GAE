@@ -1,23 +1,70 @@
 
+import os
+import urllib
+
 from google.appengine.api import users
+from google.appengine.ext import ndb
+
+import jinja2
 import webapp2
 
-class Gretting( webapp2.RequestHandler ):
+JINJA_ENVIRONMENT = jinja2.Environment(
+	loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+	extensions=['jinja2.ext.autoescape'],
+	autoescape=True)
+
+DEFAULT_GUESTBOOK_NAME = 'Diaries Fermin'
+
+def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
+    return ndb.Key('Guestbook', guestbook_name)
+
+class MainPage( webapp2.RequestHandler ):
 	def get( self ):
-		user = users.get_current_user()
+		guestbook_name = self.request.get( 'guestbook_name',
+											DEFAULT_GUESTBOOK_NAME )
+		grettings_query = Gretting.query( 
+			ancestor=guestbook_key(guestbook_name) ).order(-Gretting.date)
+		grettings = grettings_query.fetch(10)
 
-		if user:
-			gretting = ('hola soy %s<br> (<a href=%s >Salir</a>)' %
-							(user.nickname(), users.create_logout_url('/')))
+		if users.get_current_user():
+			url = users.create_logout_url( self.request.uri )
+			url_linktext = 'Salir'
 		else:
-			gretting = ('hola no estoy logueado<br> (<a href=%s >Ingresar</a>)' %
-							users.create_login_url('/'))
+			url = users.create_login_url( self.request.uri )
+			url_linktext = 'Ingresar'
 
-		self.response.write( gretting+'<br>' )
-		self.response.write( self.request.uri )
+		template_values = {
+			'grettings' : grettings,
+			'guestbook_name' : urllib.quote_plus( guestbook_name ),
+			'url' : url,
+			'url_linktext' : url_linktext,
+		}
 
+		template = JINJA_ENVIRONMENT.get_template( 'index.html' )
+		self.response.write( template.render(template_values) )
+
+class Gretting( ndb.Model ):
+	author	 = ndb.UserProperty()
+	content	 = ndb.StringProperty( indexed=False )
+	date	 = ndb.DateTimeProperty( auto_now_add=True )
+
+class Guestbook( webapp2.RequestHandler ):
+	def post( self ):
+		guestbook_name = self.request.get( 'guestbook_name',
+											DEFAULT_GUESTBOOK_NAME	 )
+		gretting = Gretting( parent=guestbook_key( guestbook_name ) )
+
+		if users.get_current_user():
+			gretting.author = users.get_current_user()
+
+		gretting.content = self.request.get('content')
+		gretting.put()
+
+		query_params = { 'guestbook_name': guestbook_name }
+		self.redirect( '/?' + urllib.urlencode(query_params))
 
 
 application = webapp2.WSGIApplication([
-	('/', Gretting),
+	('/', MainPage),
+	('/index?', Guestbook),
 	], debug=True)
