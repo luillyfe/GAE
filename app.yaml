@@ -1,4 +1,4 @@
-application: afs-cucuta
+application: .x8-mythical-patrol-p
 version: 3
 runtime: python27
 api_version: 1
