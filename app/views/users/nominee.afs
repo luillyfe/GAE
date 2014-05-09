@@ -1,0 +1,15 @@
+
+{% extends 'app/views/layout.afs' %}
+
+{% block content %}
+    <div class="row" >
+    	{% for person in persons %}
+	    	<section class="3u" >
+	    		<h4>{{ person.name }}</h4>
+	    		<a href="{{person.key()}}" class="image" >
+	    			<img src="img/{{ person.key() }}" alt="not found"/></a>
+	    	</section>
+	    {% endfor %}
+
+    </div>
+{% endblock %}

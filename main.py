@@ -1,9 +1,14 @@
 
+# -*- coding: utf-8 -*-
 import os
 import urllib
+import cgi
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
+from google.appengine.ext import db
+from google.appengine.ext import blobstore
+from google.appengine.ext.webapp import blobstore_handlers
 
 import jinja2
 import webapp2
@@ -13,58 +18,128 @@ JINJA_ENVIRONMENT = jinja2.Environment(
 	extensions=['jinja2.ext.autoescape'],
 	autoescape=True)
 
-DEFAULT_GUESTBOOK_NAME = 'Diaries Fermin'
 
-def guestbook_key(guestbook_name=DEFAULT_GUESTBOOK_NAME):
-    return ndb.Key('Guestbook', guestbook_name)
+def isUser(self):
+		if users.get_current_user():
+			url = ['users/nominee', 'users/register',
+				users.create_logout_url( self.request.uri )]
+			url_linktext = ['Envio', 'Registrar', 'Salir']
+
+		else:
+			url = ['', '',  users.create_login_url( self.request.uri )]
+			url_linktext = ['', '', 'Ingresar']
+
+		values = { 'url' : url, 'url_linktext' : url_linktext, }
+
+		return values
+
+
+class Person( db.Model ):
+	name 	 = db.StringProperty(required=True)
+	lastname = db.StringProperty(required=True)
+	neighborhood = db.StringProperty()
+	school   = db.StringProperty(required=True)
+	grade    = db.StringProperty()
+	landline = db.StringProperty()
+	cellPhone = db.StringProperty()
+	# Porque la propiedad db.emailProperty no me permite un valor vacio
+	email 	 = db.StringProperty()
+	address  = db.StringProperty()
+	picture  = blobstore.BlobReferenceProperty()
+
 
 class MainPage( webapp2.RequestHandler ):
+	def get(self):
+		values = isUser(self)
+
+		template = JINJA_ENVIRONMENT.get_template( "app/views/layout.afs" )
+		self.response.write( template.render(values) )
+
+
+class Register( webapp2.RequestHandler ):
 	def get( self ):
-		guestbook_name = self.request.get( 'guestbook_name',
-											DEFAULT_GUESTBOOK_NAME )
-		grettings_query = Gretting.query( 
-			ancestor=guestbook_key(guestbook_name) ).order(-Gretting.date)
-		grettings = grettings_query.fetch(10)
+		upload_url = blobstore.create_upload_url('/users/Nominee')
+		values = isUser(self)
+		values['upload_url'] = upload_url
 
-		if users.get_current_user():
-			url = users.create_logout_url( self.request.uri )
-			url_linktext = 'Salir'
-		else:
-			url = users.create_login_url( self.request.uri )
-			url_linktext = 'Ingresar'
+		template = JINJA_ENVIRONMENT.get_template( 'app/views/users/register.afs' )
+		self.response.write( template.render(values) )
 
-		template_values = {
-			'grettings' : grettings,
-			'guestbook_name' : urllib.quote_plus( guestbook_name ),
-			'url' : url,
-			'url_linktext' : url_linktext,
-		}
 
-		template = JINJA_ENVIRONMENT.get_template( 'index.html' )
-		self.response.write( template.render(template_values) )
+class Nominee( blobstore_handlers.BlobstoreUploadHandler ):
+	def get(self):
+		persons = Person.all()
+		
+		values = isUser(self)	
+		values['persons'] = persons
+		template = JINJA_ENVIRONMENT.get_template( 'app/views/users/nominee.afs' )
+		self.response.write( template.render(values) )
 
-class Gretting( ndb.Model ):
-	author	 = ndb.UserProperty()
-	content	 = ndb.StringProperty( indexed=False )
-	date	 = ndb.DateTimeProperty( auto_now_add=True )
-
-class Guestbook( webapp2.RequestHandler ):
 	def post( self ):
-		guestbook_name = self.request.get( 'guestbook_name',
-											DEFAULT_GUESTBOOK_NAME	 )
-		gretting = Gretting( parent=guestbook_key( guestbook_name ) )
+		name 	  = cgi.escape(self.request.get('name'))
+		lastname  = cgi.escape(self.request.get('lastname'))
+		neighborhood = cgi.escape(self.request.get('neighborhood'))
+		school    = cgi.escape(self.request.get('school'))
+		grade     = cgi.escape(self.request.get('grade'))
+		landline  = cgi.escape(self.request.get('landline'))
+		cellPhone = cgi.escape(self.request.get('cellPhone'))
+		email 	  = cgi.escape(self.request.get('email'))
+		address   = cgi.escape(self.request.get('address'))
+		picture   = self.get_uploads('file')
 
-		if users.get_current_user():
-			gretting.author = users.get_current_user()
+		if picture:
+			picture = picture[0].key()
+		
+			person = Person(name=name, lastname=lastname, email=email, 
+				neighborhood=neighborhood, school=school, address=address, 
+				grade=grade, landline=landline, cellPhone=cellPhone, picture=picture)
 
-		gretting.content = self.request.get('content')
-		gretting.put()
+		else: person = Person(name=name, lastname=lastname, email=email, 
+				neighborhood=neighborhood, school=school, address=address, 
+				grade=grade, landline=landline, cellPhone=cellPhone)
+		person.put()
 
-		query_params = { 'guestbook_name': guestbook_name }
-		self.redirect( '/?' + urllib.urlencode(query_params))
+		self.redirect( '/users/Nominee'  )
+	"""def post(self):
+		picture = self.get_uploads('file')[0]
+
+		self.redirect( '/users/img/%s' % picture.key() )"""
+
+
+class Show( webapp2.RequestHandler ):
+	def get(self, resource):
+		values = isUser(self)
+		person = ''
+
+		try: person = Person.get(urllib.unquote(resource))
+		except: view = ''
+
+		if person:
+			values['person'] = person
+			view = 'app/views/users/show.afs'
+		else: view = 'app/views/not_found.afs'
+
+		template = JINJA_ENVIRONMENT.get_template( view )
+		self.response.write( template.render(values) )
+
+		
+class ServeBlob( blobstore_handlers.BlobstoreDownloadHandler ):
+    def get(self, resource):
+    	try: person = db.get(urllib.unquote(resource))
+        except: person = ''
+
+    	if person.picture:
+    		self.send_blob(person.picture.key())
+    	else: self.send_blob('hipJSqDGbFwkr0UYB-lgHQ==')
+
+
+
 
 
 application = webapp2.WSGIApplication([
 	('/', MainPage),
-	('/index?', Guestbook),
+	('/users/register', Register),
+	('/users/nominee', Nominee),
+	('/users/([^/]+)?', Show),
+	('/users/img/([^/]+)?', ServeBlob),
 	], debug=True)
