@@ -1,24 +1,14 @@
 application: x8-mythical-patrol-p
-version: 4
+version: 2
 runtime: python27
 api_version: 1
 threadsafe: yes
 
 handlers:
-- url: /css
-  static_dir: public/css
+- url: /stylesheets
+  static_dir: stylesheets
 
-- url: /js
-  static_dir: public/js
-
-- url: /images
-  static_dir: public/images
-
-- url: /users/.*
-  script: main.application
-  login: required
-
-- url: /.*
+- url: .*
   script: main.application
 
 libraries:
