@@ -1,0 +1,113 @@
+{% extends "app/views/layout.afs" %}
+
+{% block form %}
+	<div id="container" class="container" >
+		<div class="row" ><section class="8u" >
+			<a href="http://localhost:8080/meetings/">atras</a>
+	
+			<form id="nominee" action="{{ upload_url }}" method="post" 
+				enctype="multipart/form-data"  >
+		  		<div class="form_settings" id="form_settings" >
+		  			<input type="hidden" name="key" value="{{ meeting.key() }}" >
+
+					<p><span>Nombre:</span><input class="contact" type="text" 
+						name="name" value="{{ meeting.name }}" /></p>
+					<p><span>Agregar participante:</span><input class="contact" type="button" 
+						name="add" value="agregar" onclick="addNominee()" /></p>
+					<p><span>Participantes invitados:</span>
+						<label class="contact" id="ninvited">0</label></p>
+					<input class="contact" type="hidden" id="invited" name="invited" value="" >
+					<p><span>Fecha de inicio:</span><input class="contact" type="date" 
+						name="date_begin" value="{{ meeting.datetime_begin.date() }}" /></p>
+					<p><span>Hora de inicio:</span><input class="contact" type="time" 
+						name="time_begin" value="{{ meeting.datetime_begin.time() }}"  /></p>
+					<p><span>Fecha de finalizacion:</span><input class="contact" type="date" 
+						name="date_end" value="{{ meeting.datetime_end.date() }}" /></p>
+					<p><span>Hora de finalizacion:</span><input class="contact" type="time" 
+						name="time_end" value="{{ meeting.datetime_end.time() }}"  /></p>
+					<p><span>Ubicacion:</span><input class="contact" type="text" 
+					name="location" value="{{ meeting.location }}" /></p>
+					<p><span>Detalles:</span><textarea class="contact textarea" 
+						rows="5" cols="50" name="details">{{ meeting.details }}</textarea></p>
+					<p><span>&nbsp;</span><input id="submit" class="submit" type="submit" 
+					value="enviar" /></p>
+				</div>
+			</form>
+		</section>
+	</div>	</div>
+
+	<div id="addNominees" class="tabs" >
+		{% for i in range(nominees.count()) %}
+			{%  if i%10 == 0 %}
+				{% if i != 0 %}	
+	    			</div> </div>
+	    		{%  endif %}
+	    		<div class="tab" >
+	    			<input type="radio" class="tab" id="tab-{{i}}" name="tab-group-1" checked>
+       				<label class="title" for="tab-{{i}}">{{i}}</label>
+       				<div class="content">
+	    	{%  endif %}	
+
+			<input type="checkbox" class="checkNominee" name="checkNominee" 
+				value="{{ nominees[i].key() }}" >
+			<label>{{ nominees[i].name }}</label>
+			<label>{{ nominees[i].lastname }}</label><br>
+		
+		{% endfor %}
+		<!-- Revisar -->
+		</div></div>
+		<input type="button" value="agregar todos" onclick="addAll()" >
+		<input type="button" value="agregar" onclick="addBack()" >
+	</div>
+
+	<script type="text/javascript">
+		function addNominee() {
+			document.getElementById("header_container").style.opacity= 0.5;
+			document.getElementById("container").style.opacity= 0.5;
+			document.getElementById("gallery").style.opacity= 0.5;
+			document.getElementById("footer").style.opacity= 0.5;
+			document.getElementById("addNominees").style.visibility = "visible";
+			document.getElementById("submit").disabled = true;
+		}
+
+		function addBack() {
+			document.getElementById("header_container").style.opacity= 1;
+			document.getElementById("container").style.opacity= 1;
+			document.getElementById("gallery").style.opacity= 1;
+			document.getElementById("footer").style.opacity= 1;
+			document.getElementById("addNominees").style.visibility = "hidden";
+			document.getElementById("submit").disabled = false;	
+
+			nominees();
+		}
+
+		function nominees() {
+			var checkbox    = document.getElementsByClassName("checkNominee");
+			var checked  = 0;
+			var form 		= document.getElementById('form_settings');
+
+			var childs = document.getElementsByName('invited[]');
+			for (var i = childs.length - 1; i >= 0; i--) {
+				var child = document.getElementById(childs[i].id)
+				try { form.removeChild( child ) }
+				catch(err) { continue }	}
+			
+			for (var i = checkbox.length - 1; i >= 0; i--) {
+				if(checkbox[i].checked){
+					var invited = document.createElement('input');
+					invited.type 	= 'hidden';
+					invited.name 	= 'invited[]';
+					invited.id  	= checkbox[i].value;
+					invited.value 	= checkbox[i].value;
+					form.appendChild(invited);
+					checked++;	}	}
+			document.getElementById("ninvited").innerHTML = checked;  
+		}
+		function addAll() {
+			var checkbox    = document.getElementsByClassName("checkNominee");
+			for (var i = checkbox.length - 1; i >= 0; i--) {
+					checkbox[i].checked = true;
+				}	
+		}
+	</script>
+{% endblock %}

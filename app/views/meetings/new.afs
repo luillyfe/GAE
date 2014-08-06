@@ -1,0 +1,29 @@
+
+{% extends "app/views/layout.afs" %}
+
+{% block form %}
+	<div class="container" ><div class="row" ><section class="8u" >
+	<a href="http://localhost:8080/meetings/">atras</a>
+
+	<form id="meeting" action="{{ upload_url }}" method="post" enctype="multipart/form-data"  >
+  		<div class="form_settings">
+			<p><span>Nombre:</span><input class="contact" type="text" 
+				name="name" /></p>
+			<p><span>Fecha de inicio:</span><input class="contact" type="date" 
+				name="date_begin" /></p>
+			<p><span>Hora de inicio:</span><input class="contact" type="time" 
+				name="time_begin" /></p>
+			<p><span>Fecha de finalizacion:</span><input class="contact" type="date" 
+				name="date_end" /></p>
+			<p><span>Hora de finalizacion:</span><input class="contact" type="time" 
+				name="time_end" /></p>
+			<p><span>Ubicacion:</span><input class="contact" type="text" 
+			name="location" /></p>
+			<p><span>Detalles:</span><textarea class="contact textarea" 
+				rows="5" cols="50" name="details"></textarea></p>
+			<p><span>&nbsp;</span><input id="submit" class="submit" type="submit" 
+			value="enviar" /></p>
+		</div>
+	</form>
+	</section></div></div>
+{% endblock %}

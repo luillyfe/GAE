@@ -10,14 +10,8 @@ indexes:
 # automatically uploaded to the admin console when you next deploy
 # your application using appcfg.py.
 
-- kind: Greeting
+- kind: PersonForMeeting
   ancestor: yes
   properties:
-  - name: date
-    direction: desc
-
-- kind: Gretting
-  ancestor: yes
-  properties:
-  - name: date
-    direction: desc
+  - name: Meeting
+  - name: person

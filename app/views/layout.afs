@@ -9,10 +9,10 @@
     <link href="http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,300italic,600|Source+Code+Pro" rel="stylesheet" />
     <!--[if lte IE 8]><script src="js/html5shiv.js" type="text/javascript"></script><![endif]-->
     <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
-    <script src="../js/jquery.dropotron.min.js"></script>    
-    <script src="../js/skel.min.js">
+    <script src="http://localhost:8080/js/jquery.dropotron.min.js"></script>    
+    <script src="http://localhost:8080/js/skel.min.js">
     {
-      prefix: '../css/style',
+      prefix: 'http://localhost:8080/css/style',
       preloadStyleSheets: true,
       resetCSS: true,
       boxModel: 'border',
@@ -81,9 +81,17 @@
         <nav id="main-nav" class="8u" >
           <ul>
             <li><a class="active" href="#">inicio</a></li>
-            {% for i in  range(3) %}
-              <li><a href="{{ url[i] }}">{{ url_linktext[i] }}</a></li>
-            {% endfor %}
+            <li><a href="http://localhost:8080/nominees/">envio</a>
+              <ul>
+                <li><a href="http://localhost:8080/nominees/new">Registrar Candidato</a></li>
+              </ul>
+            </li>
+            <li><a href="http://localhost:8080/meetings/">eventos</a>
+              <ul>
+                <li><a href="http://localhost:8080/meetings/new">Registrar evento</a></li>
+              </ul>
+            </li>
+            <li><a href="{{ url }}">{{ url_linktext }}</a></li>
           </ul>
         </nav>
       </div>
@@ -93,22 +101,25 @@
       <div class="12u" >
         <div id="wrapper-banner" >
           <div id="banner" >
-            <a href="#"><img src="../images/banner3.jpg" alt="banner image" /></a>
+            <a href="#"><img src="http://localhost:8080/images/banner3.jpg" alt="banner image" /></a>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="site_content" >{% block form %}{% endblock %}</div>
+  <div id="site_content" >
+    {% block form %}
+    {% endblock %}
+  </div>
 
-  <div class="gallery-wrapper" >
+  <div id="gallery" class="gallery-wrapper" >
     <div class="container" >
-      {% block content %}{% endblock %}
-  
-  </div></div>
+      {% block content %}
+      {% endblock %}
+  </div>  </div>
 
-  <div class="footer-wrapper" ></div>
+  <div id="footer"  class="footer-wrapper" ></div>
   </body>
 </html>
 {% endautoescape %}

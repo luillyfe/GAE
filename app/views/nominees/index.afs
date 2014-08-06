@@ -1,0 +1,34 @@
+
+{% extends 'app/views/layout.afs' %}
+
+{% block content %}    
+    	{% for i in range(persons.count()) %}
+    		{%  if i%4 == 0 %}
+				{% if i != 0 %}	
+	    				</div>
+	    		{%  endif %}
+	    		<div class="row" >
+	    	{%  endif %}	
+
+			<section class="3u" >
+				<h4>{{ persons[i].name }}</h4>
+			  	<a href="{{persons[i].key()}}" class="image" >
+			    	<img src="img/{{ persons[i].key() }}" alt="not found"/></a>
+			    <a class="link_to_e" 
+			    href="http://localhost:8080/nominees/{{ persons[i].key() }}">leer</a>
+			    <a class="link_to_e" 
+			    href="http://localhost:8080/nominees/{{ persons[i].key() }}/edit">editar</a>
+			    <a class="link_to_e" 
+			    href="javascript:AlertIt('{{ persons[i].key() }}');">eliminar</a>
+			</section>	
+	    {% endfor %}
+
+	    <script type="text/javascript">
+		    function AlertIt(key) {
+		    	var answer = confirm("estas seguro?");
+		        if (answer){
+		          window.location="http://localhost:8080/nominees/"+key+"/delete";
+		        }
+		      }
+		</script>	
+{% endblock %}

@@ -409,3 +409,101 @@ table tr td {
   color: #47433F;
   border-top: 1px solid #FFF;
 }
+
+section a.link_to_e {
+	visibility: hidden;
+}
+
+section:hover a.link_to_e {
+	visibility: visible;
+}
+
+div.maps {
+	display: block;
+	height: 135px;
+	width: 203px;
+}
+
+div#addNominees {
+	background-color: white;
+    display: block;
+    height: 100%;
+    position: absolute;
+    top: 90%;
+    visibility: hidden;
+    width: 100%;
+    padding: 5% 20%;
+}
+
+#tabs { /* es el rectángulo contenedor */
+	margin: 0 auto;
+	min-height: 200px;
+	position: relative;
+	width: 550px;
+}
+
+.tab { /* cada una de las pestañas */
+	float: left;
+}
+
+.tab label.title { /* la parte superior con el título de la pestaña */
+	background-color: #456;
+	border-radius: 5px 5px 0 0;
+	box-shadow: -3px 3px 2px #678 inset;
+	color: #DDD;
+	cursor: pointer;
+	left: 0;
+	margin-right: 1px;
+	padding: 5px 15px;
+	position: relative;
+	text-shadow: 1px 1px #000;
+}
+
+/* el control input sólo lo necesitamos para que las pestañas permanezcan abiertas así que lo ocultamos */
+.tab [type=radio].tab { display: none; }
+
+/* el contenido de las pestañas */
+.content {
+	background-color: #678;
+	bottom: 0;
+	left: 20%;
+	overflow: hidden;
+	padding: 20px;
+	position: absolute;
+	right: 20%;
+	top: 15%;
+}
+
+/* y un poco de animación */
+.content > * {
+	opacity: 0;
+
+	-moz-transform: translateX(-100%);
+	-webkit-transform: translateX(-100%);
+	-o-transform: translateX(-100%);
+
+	-moz-transition: all 0.6s ease;
+	-webkit-transition: all 0.6s ease;
+	-o-transition: all 0.6s ease;
+}
+
+/* controlamos la pestaña activa */
+[type="radio"]:checked ~ label.title {
+	background-color: #678;
+	box-shadow: 0 3px 2px #89A inset;
+	color: #FFF;
+	z-index: 2;
+}
+
+[type=radio]:checked ~ label.title ~ .content { z-index: 1; }
+[type=radio]:checked ~ label.title ~ .content > * {
+	opacity: 1;
+	-moz-transform: translateX(0);
+	-webkit-transform: translateX(0);
+	-o-transform: translateX(0);
+	-ms-transform: translateX(0);
+}
+
+[type=buttom] {
+	background-color: red;
+}
