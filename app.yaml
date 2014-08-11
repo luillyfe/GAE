@@ -1,34 +1,21 @@
+
+# Una aplicacion python en Google App Engine se configura a través de un 
+# archivo con nombre app.yaml, en donde se especifica como las URLs se
+# corresponden con controladores (handlers) y archivos estaticos 
+# (css,js,etc). Ademas contiene información del ID y la ultima version
+# de la aplicación.    
+
 application: x8-mythical-patrol-p
-version: 4
+version: 5
 runtime: python27
 api_version: 1
 threadsafe: yes
 
+# Aqui se definen las intrucciones para indicarle al servidor que codigo 
+# debe ejecutar cuando se le haga una petición
+
 handlers:
-- url: /css
-  static_dir: public/css
-
-- url: /js
-  static_dir: public/js
-
-- url: /images
-  static_dir: public/images
-
-- url: /nominees/*.*
+# Esto significa que para cualquier URL que coincida con el patron /.*
+# debe utilizar el codigo de aplicacion (intrucciones) en el archivo main.py 
+- url: /.*
   script: main.application
-  login: required
-
-- url: /meetings/*.*
-  script: main.application
-  login: required
-
-- url: /
-  script: main.application
-
-libraries:
-- name: jinja2
-  version: "2.6"
-- name: markupsafe
-  version: "0.15"
-- name: webapp2
-  version: latest

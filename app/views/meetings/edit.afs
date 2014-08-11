@@ -56,7 +56,7 @@
 		{% endfor %}
 		<!-- Revisar -->
 		</div></div>
-		<input type="button" value="agregar todos" onclick="addAll()" >
+		<input type="button" value="todos" onclick="addAll()" >
 		<input type="button" value="agregar" onclick="addBack()" >
 	</div>
 
@@ -69,7 +69,6 @@
 			document.getElementById("addNominees").style.visibility = "visible";
 			document.getElementById("submit").disabled = true;
 		}
-
 		function addBack() {
 			document.getElementById("header_container").style.opacity= 1;
 			document.getElementById("container").style.opacity= 1;
@@ -80,7 +79,6 @@
 
 			nominees();
 		}
-
 		function nominees() {
 			var checkbox    = document.getElementsByClassName("checkNominee");
 			var checked  = 0;
@@ -105,9 +103,13 @@
 		}
 		function addAll() {
 			var checkbox    = document.getElementsByClassName("checkNominee");
+			var action = true;
+			if(checkbox[0].checked === true)
+				action = false;
+
 			for (var i = checkbox.length - 1; i >= 0; i--) {
-					checkbox[i].checked = true;
-				}	
+					checkbox[i].checked = action;
+			}	
 		}
 	</script>
 {% endblock %}
