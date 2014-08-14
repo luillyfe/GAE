@@ -19,3 +19,7 @@ handlers:
 # debe utilizar el codigo de aplicacion (intrucciones) en el archivo main.py 
 - url: /.*
   script: main.application
+
+libraries:
+- name: webapp2
+  version: latest
