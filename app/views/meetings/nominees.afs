@@ -1,6 +1,0 @@
-{% for nominee in nominees %}
-
-	<label>{{ nominee.name }}</label>
-	<label>{{ nominee.lastname }}</label><br>
-
-{% endfor %}

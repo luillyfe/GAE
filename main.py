@@ -1,31 +1,21 @@
 
 # -*- coding: utf-8 -*-
-import cgi
+import os
 import urllib
 
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
+import jinja2
 import webapp2
 import models
 
 
-# Formulario para enviar saludos
-MAIN_PAGE_FOOTER_TEMPLATE = """\
-<html>
-  <body>
-    <form action="/sign?%s" method="post">
-      <div><textarea name="content" rows="3" cols="60"></textarea></div>
-      <div><input type="submit" value="Firmar"></div>
-    </form>
-    <form>Guestbook name:
-      <input value="%s" name="guestbook_name">
-      <input type="submit" value="cambiar">
-    </form>
-    <a href="%s">%s</a>
-  </body>
-</html>
-"""
+# 
+JINJA_ENVIRONMENT = jinja2.Environment(
+	loader=jinja2.FileSystemLoader(os.path.dirname(__file__)),
+	extensions=['jinja2.ext.autoescape'],
+	autoescape=True)
 
 # Una costante que representa el nombre del libro
 DEFAULT_GUESTBOOK_NAME = 'default_guestbook'
@@ -67,10 +57,14 @@ class MainPage( webapp2.RequestHandler ):
 			url = users.create_login_url(self.request.uri)
 			url_linktext = 'Login'
 		
-		# Escribe el formulario y el pie de pagina.
-		sign_query_params = urllib.urlencode({'guestbook_name': guestbook_name})
-		self.response.write(MAIN_PAGE_FOOTER_TEMPLATE %
-			(sign_query_params, cgi.escape(guestbook_name), url, url_linktext))
+		template_values = {
+			'greetings': greetings,
+			'guestbook_name': urllib.quote_plus(guestbook_name),
+			'url': url,
+			'url_linktext': url_linktext, 
+		}
+		template = JINJA_ENVIRONMENT.get_template('/app/views/index.html')
+		self.response.write(template.render(template_values))
 
 	def post(self):
     	# Fijamos la misma clave padre en el 'Saludo' para garantizar que cada

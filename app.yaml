@@ -15,11 +15,17 @@ threadsafe: yes
 # debe ejecutar cuando se le haga una petición
 
 handlers:
+- url: /css
+  static_dir: public/css
+
 # Esto significa que para cualquier URL que coincida con el patron /.*
 # debe utilizar el codigo de aplicacion (intrucciones) en el archivo main.py 
 - url: /.*
   script: main.application
 
+
 libraries:
 - name: webapp2
+  version: latest
+- name: jinja2
   version: latest
